@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yujie6/Documents/PPCA/riscv/main.cpp
+iostream
+-
+program.hpp
+/home/yujie6/Documents/PPCA/riscv/program.hpp
+
+/home/yujie6/Documents/PPCA/riscv/memory.hpp
+
+/home/yujie6/Documents/PPCA/riscv/parser.hpp
+deque
+-
+sstream
+-
+
+/home/yujie6/Documents/PPCA/riscv/program.hpp
+fstream
+-
+cstring
+-
+cstdio
+-
+parser.hpp
+/home/yujie6/Documents/PPCA/riscv/parser.hpp
+memory.hpp
+/home/yujie6/Documents/PPCA/riscv/memory.hpp
+

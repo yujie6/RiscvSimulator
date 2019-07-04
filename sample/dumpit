@@ -1,0 +1,2 @@
+#!/bin/sh
+../riscv32i/riscv32-unknown-elf/bin/objdump -b elf32-littleriscv -m riscv -d sample.o  > ans.dump

@@ -1,0 +1,74 @@
+
+sample.o:     file format elf64-little
+
+
+Disassembly of section .text:
+
+0000000000000000 <_Z8printInti>:
+   0:	4855                	li	a6,21
+   2:	e589                	bnez	a1,c <_Z8printInti+0xc>
+   4:	7d89                	lui	s11,0xfffe2
+   6:	8bfc                	0x8bfc
+   8:	0005                	c.nop	1
+   a:	0000                	unimp
+   c:	3300                	fld	fs0,32(a4)
+   e:	fc45                	bnez	s0,ffffffffffffffc6 <main+0xffffffffffffff4e>
+  10:	0589                	addi	a1,a1,2
+  12:	0000                	unimp
+  14:	0000                	unimp
+  16:	0000058b          	0x58b
+  1a:	0000                	unimp
+  1c:	ad05                	j	64c <main+0x5d4>
+  1e:	0000                	unimp
+  20:	8900                	0x8900
+  22:	0005                	c.nop	1
+  24:	0000                	unimp
+  26:	9000                	0x9000
+  28:	c35d                	beqz	a4,ce <main+0x56>
+
+000000000000002a <_Z8printStrPKc>:
+  2a:	4855                	li	a6,21
+  2c:	e589                	bnez	a1,36 <_Z8printStrPKc+0xc>
+  2e:	8948                	0x8948
+  30:	e87d                	bnez	s0,126 <main+0xae>
+  32:	8b48                	0x8b48
+  34:	e845                	bnez	s0,e4 <main+0x6c>
+  36:	8948                	0x8948
+  38:	f845                	bnez	s0,ffffffffffffffe8 <main+0xffffffffffffff70>
+  3a:	8b48                	0x8b48
+  3c:	f845                	bnez	s0,ffffffffffffffec <main+0xffffffffffffff74>
+  3e:	8400b60f          	0x8400b60f
+  42:	74c0                	ld	s0,168(s1)
+  44:	4830                	lw	a2,80(s0)
+  46:	0ff8458b          	0xff8458b
+  4a:	00b6                	slli	ra,ra,0xd
+  4c:	8bd0be0f          	0x8bd0be0f
+  50:	0005                	c.nop	1
+  52:	0000                	unimp
+  54:	3100                	fld	fs0,32(a0)
+  56:	89d0                	0x89d0
+  58:	0005                	c.nop	1
+  5a:	0000                	unimp
+  5c:	8b00                	0x8b00
+  5e:	0005                	c.nop	1
+  60:	0000                	unimp
+  62:	0500                	addi	s0,sp,640
+  64:	0209                	addi	tp,tp,2
+  66:	0000                	unimp
+  68:	0589                	addi	a1,a1,2
+  6a:	0000                	unimp
+  6c:	0000                	unimp
+  6e:	8348                	0x8348
+  70:	f845                	bnez	s0,20 <_Z8printInti+0x20>
+  72:	eb01                	bnez	a4,82 <main+0xa>
+  74:	90c5                	srli	s1,s1,0x31
+  76:	c35d                	beqz	a4,11c <main+0xa4>
+
+0000000000000078 <main>:
+  78:	4855                	li	a6,21
+  7a:	e589                	bnez	a1,84 <main+0xc>
+  7c:	0000b1bf 0000e800 	0xe8000000b1bf
+  84:	0000                	unimp
+  86:	0000058b          	0x58b
+  8a:	0000                	unimp
+  8c:	c35d                	beqz	a4,132 <main+0xba>
