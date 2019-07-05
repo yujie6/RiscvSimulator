@@ -1,0 +1,18 @@
+#!/bin/bash
+:<<EOF
+echo :
+sdasd
+sadasdsd
+EOF
+str="hello";
+test_file=(
+"gcd.data"
+"hanoi.data"
+"expr.data"
+);
+for file in ${test_file}
+do
+		echo ${file};
+done
+echo
+echo $str;
