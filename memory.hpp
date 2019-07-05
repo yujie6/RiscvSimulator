@@ -18,19 +18,23 @@ public:
     void init() {
         int32_t AddrNow = 0;
         std::string aa, bb, cc, dd;
-        while (!cin.eof()) {
-            cin >> aa;
-            if (aa[0] == 'q') {
+        char tmp[20];
+        while (scanf("%s", tmp) != EOF) {
+            if (tmp[0] == 'q') {
                 MaxPc = AddrNow;
                 break;
             }
-            if (aa[0] == '@') {
-                AddrNow = (HexToInt(aa.substr(1, 3)) << 24) +
-                          (HexToInt(aa.substr(3, 5)) << 16) +
-                          (HexToInt(aa.substr(5, 7)) << 8) +
-                          (HexToInt(aa.substr(7, 9)));
+            if (tmp[0] == '@') {
+                aa.clear();
+                for (int i = 1; i <= 8; i++) { aa.push_back(tmp[i]);}
+                AddrNow = (HexToInt(aa.substr(0, 2)) << 24) +
+                          (HexToInt(aa.substr(2, 2)) << 16) +
+                          (HexToInt(aa.substr(4, 2)) << 8) +
+                          (HexToInt(aa.substr(6, 2)));
 
             } else {
+                aa.clear();
+                aa.push_back(tmp[0]); aa.push_back(tmp[1]);
                 cin >> bb >> cc >> dd;
                 memory[AddrNow] = HexToInt(aa);
                 memory[AddrNow + 1] = HexToInt(bb);
