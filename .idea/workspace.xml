@@ -12,6 +12,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d2530bab-e526-49ab-b9c5-8bc48692b620" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/test" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/test.cbp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code.cbp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/program.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/program.hpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -52,8 +56,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/parser.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="112" column="19" lean-forward="true" selection-start-line="112" selection-start-column="19" selection-end-line="112" selection-end-column="19" />
+            <state relative-caret-position="203">
+              <caret line="86" column="10" selection-start-line="86" selection-start-column="10" selection-end-line="86" selection-end-column="10" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -64,8 +68,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/program.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
-              <caret line="76" column="14" selection-start-line="76" selection-start-column="14" selection-end-line="76" selection-end-column="14" />
+            <state relative-caret-position="42">
+              <caret line="419" column="27" lean-forward="true" selection-start-line="419" selection-start-column="27" selection-end-line="419" selection-end-column="27" />
               <folding>
                 <element signature="e#39#57#0" expanded="true" />
               </folding>
@@ -108,6 +112,12 @@
       <find>SLTIU</find>
       <find>BGEU</find>
       <find>sra</find>
+      <find>0x3f</find>
+      <find>srai</find>
+      <find>SLLI</find>
+      <find>slt</find>
+      <find>srli</find>
+      <find>SRLI</find>
     </findStrings>
     <replaceStrings>
       <replace>CurrentInst</replace>
@@ -134,8 +144,8 @@
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="28" />
-    <option name="width" value="1066" />
-    <option name="height" value="872" />
+    <option name="width" value="1920" />
+    <option name="height" value="1080" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -205,12 +215,12 @@
       <updated>1561972218507</updated>
       <workItem from="1561972219683" duration="973000" />
       <workItem from="1562027837435" duration="37538000" />
-      <workItem from="1562132681045" duration="43056000" />
+      <workItem from="1562132681045" duration="50640000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="81567000" />
+    <option name="totallyTimeSpent" value="89151000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -222,26 +232,26 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="28" width="1600" height="872" extended-state="6" />
+    <frame x="0" y="28" width="1920" height="1052" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22072072" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18303095" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.77899045" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.28785813" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.22015335" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.37239867" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32968238" />
       <window_info anchor="bottom" id="Tail" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4990775" weight="0.43519783" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4990775" weight="0.28785813" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5009225" side_tool="true" weight="0.18729463" />
       <window_info anchor="bottom" id="CMake" order="12" weight="0.3603505" />
-      <window_info active="true" anchor="bottom" id="Messages" order="13" visible="true" weight="0.36562073" />
+      <window_info anchor="bottom" id="Messages" order="13" weight="0.36473164" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -254,32 +264,47 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <condition expression="ProgramCounter &gt;= 4320" language="ObjectiveC" />
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <condition expression="ProgramCounter == 5728" language="ObjectiveC" />
           <url>file://$PROJECT_DIR$/program.hpp</url>
-          <line>68</line>
-          <option name="timeStamp" value="36" />
-        </line-breakpoint>
-        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/program.hpp</url>
-          <line>66</line>
-          <option name="timeStamp" value="38" />
+          <line>72</line>
+          <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/program.hpp</url>
-          <line>450</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/program.hpp</url>
-          <line>455</line>
-          <option name="timeStamp" value="49" />
+          <line>448</line>
+          <option name="timeStamp" value="52" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>ProgramCounter == 5728</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>ProgramCounter == 5732</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>ProgramCounter &gt;= 4436</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>ProgramCounter == 4436</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>ProgramCounter = 11</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>ans == 173</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -297,32 +322,6 @@
       </expression>
       <expression>
         <expression-string>ProgramCounter == 4344</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>Reg[10] = 1358954497</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>ProgramCounter == 4096</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>ProgramCounter == 4096
-        uint32_t Reg1, Reg2r;</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>inst == 181732627</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>((unsigned int)Reg[10]) &amp; 255u == 173</expression-string>
         <language-id>ObjectiveC</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -416,16 +415,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="112" column="19" lean-forward="true" selection-start-line="112" selection-start-column="19" selection-end-line="112" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -436,10 +425,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/parser.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="86" column="10" selection-start-line="86" selection-start-column="10" selection-end-line="86" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/program.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="76" column="14" selection-start-line="76" selection-start-column="14" selection-end-line="76" selection-end-column="14" />
+        <state relative-caret-position="42">
+          <caret line="419" column="27" lean-forward="true" selection-start-line="419" selection-start-column="27" selection-end-line="419" selection-end-column="27" />
           <folding>
             <element signature="e#39#57#0" expanded="true" />
           </folding>

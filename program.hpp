@@ -10,7 +10,7 @@
 
 namespace yujie6 {
     struct PipeRegister {
-        uint32_t Imm1;
+        uint64_t Imm1;
         int64_t op1, op2;
         uint32_t dest;
     };
@@ -64,9 +64,9 @@ public:
 
     inline void Run() {
         while (true) {
-            auto ans = (((unsigned int) Reg[10]) & 255u);
             Fetch();
             if (inst == 13009443) {
+                auto ans = (((unsigned int) Reg[10]) & 255u);
                 cout << ans << "\n";
                 break;
             }
@@ -74,7 +74,9 @@ public:
             Execute();
             MemoryAccess();
             WriteBack();
-            //cout << ans << "\n";
+            auto ans = (((unsigned int) Reg[10]) & 255u);
+            //cout << std::hex << ProgramCounter << " ";
+            //cout << std::dec << ans << "\n";
             if (Reg[0] != 0) Reg[0] = 0;
         }
     }
@@ -419,7 +421,7 @@ public:
                 break;
             }
             case SLLI: {
-                Wreg.out = (FReg.op1 << FReg.Imm1);
+                Wreg.out = (unsigned)FReg.op1 << (int)((FReg.Imm1<<27)>>27);
                 /*
                  *  TODO check shamt
                  */
@@ -444,16 +446,15 @@ public:
                 break;
             }
             case SRLI: {
-                Wreg.out = (uint64_t) FReg.op1 >> (uint64_t) FReg.Imm1; //符号拓展？？
+                Wreg.out =  (unsigned)FReg.op1 >> (int) ((FReg.Imm1<<27)>>27); //符号拓展？？
                 break;
             }
             case SRA: {
-                Wreg.out = FReg.op1 >> FReg.op2;
-                // TODO shift right arith
+                Wreg.out = FReg.op1 >> (FReg.op2 & 0x3F);
                 break;
             }
             case SRAI: {
-                Wreg.out = FReg.op1 >> FReg.Imm1;
+                Wreg.out = FReg.op1 >> (int) ((FReg.Imm1<<27)>>27);
                 break;
             }
             case XOR: {
@@ -551,6 +552,9 @@ public:
             case LW: {
                 Wreg.Memdest = FReg.op1 + FReg.Imm1;
                 break;
+            }
+            case UNKNOWN: {
+                cout << " shit "; break;
             }
             default: {
             }
