@@ -8,6 +8,6 @@ using namespace yujie6;
 
 int main(){
     program riscv;
-    riscv.Run();
+    riscv.FiveStageRun();
     return 0;
 }

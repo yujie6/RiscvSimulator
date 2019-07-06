@@ -1,4 +1,3 @@
-#include <deque>
 #include <sstream>
 
 namespace yujie6 {
@@ -17,41 +16,6 @@ namespace yujie6 {
     const int OP_JALR = 0x67;  // 1100111
     const int OP_IMM32 = 0x1B; // 0011011
     const int OP_32 = 0x3B;    // 0111011
-
-    enum Reg {
-        REG_ZERO = 0,
-        REG_RA = 1,
-        REG_SP = 2,
-        REG_GP = 3,
-        REG_TP = 4,
-        REG_T0 = 5,
-        REG_T1 = 6,
-        REG_T2 = 7,
-        REG_S0 = 8,
-        REG_S1 = 9,
-        REG_A0 = 10,
-        REG_A1 = 11,
-        REG_A2 = 12,
-        REG_A3 = 13,
-        REG_A4 = 14,
-        REG_A5 = 15,
-        REG_A6 = 16,
-        REG_A7 = 17,
-        REG_S2 = 18,
-        REG_S3 = 19,
-        REG_S4 = 20,
-        REG_S5 = 21,
-        REG_S6 = 22,
-        REG_S7 = 23,
-        REG_S8 = 24,
-        REG_S9 = 25,
-        REG_S10 = 26,
-        REG_S11 = 27,
-        REG_T3 = 28,
-        REG_T4 = 29,
-        REG_T5 = 30,
-        REG_T6 = 31,
-    };
 
     enum InstType {
         R_TYPE,
@@ -119,22 +83,62 @@ namespace yujie6 {
     };
 
 
+    struct FReg {
+        // Control Signals
+        bool bubble;
+        uint32_t stall;
+
+        uint64_t pc;
+        uint32_t inst;
+    };
+    struct DReg {
+        // Control Signals
+        bool bubble;
+        uint32_t rs1, rs2;
+        uint64_t pc;
+        Inst inst;
+        uint32_t srcInst;
+    };
+    struct EReg {
+        // Control Signals
+        bool bubble;
+        bool writeback;
+        uint32_t stall;
+        uint64_t pc;
+        Inst inst;
+        int64_t op1;
+        int64_t op2;
+        uint64_t Imm;
+        uint32_t dest;
+        int64_t out;
+    };
+    struct MReg {
+        MReg(){
+            bubble = mem = writeback = false;
+        }
+        bool bubble;
+        bool mem;
+        bool writeback;
+        uint64_t pc;
+        Inst inst;
+        int len;
+        int64_t out;
+        uint32_t Memdest;
+        uint32_t RegTowrite;
+    };
+
+    struct WReg {
+        bool bubble;
+        uint64_t pc;
+        Inst inst;
+        int64_t out;
+        bool writeback;
+        uint32_t RegTowrite;
+    };
+
+
+
 }
 
 using namespace yujie6;
 
-class parser {
-    // 0x3FF -> 1111111111
-    // 0xFF  ->   11111111
-public:
-    std::deque<uint32_t> token;
-
-
-    parser() {
-
-    }
-
-    uint32_t getPageOffset(uint32_t addr) { return addr & 0xFFF; }
-
-
-};

@@ -3,4 +3,4 @@ project(code)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(code main.cpp parser.hpp memory.hpp program.hpp)
+add_executable(code main.cpp Namespace.hpp memory.hpp program.hpp)

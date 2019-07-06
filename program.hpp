@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
-#include "parser.hpp"
+#include "Namespace.hpp"
 #include "memory.hpp"
 
 namespace yujie6 {
@@ -14,14 +14,6 @@ namespace yujie6 {
         int64_t op1, op2;
         uint32_t dest;
     };
-
-    struct WLRegister {
-        bool writeback, mem;
-        int64_t out;
-        uint32_t Memdest;
-        uint32_t RegTowrite;
-    };
-
 
     inline bool isBranchOrStore(Inst inst) {
         return inst == BEQ || inst == BNE || inst == BLT || inst == BGE ||
@@ -46,23 +38,48 @@ using std::cout;
 
 class program {
 public:
-    parser *par;
     MemoryController *MemControl;
     int ProgramCounter;
     Inst CurrentInst;
-    PipeRegister FReg;
-    WLRegister Wreg;
+    PipeRegister Fereg;
     uint32_t inst;
     int Reg[32];
+    bool DataHazard;
+    bool ControlHazard;
+    FReg fReg;
+    DReg dReg;
+    EReg eReg;
+    MReg mReg;
+    WReg wReg;
 
     program() {
-        par = new parser();
         memset(Reg, 0, sizeof(Reg));
         MemControl = new MemoryController();
         ProgramCounter = 0;
+        DataHazard = ControlHazard = false;
+        fReg.bubble = false;
+        dReg.bubble = eReg.bubble = true;
+        mReg.bubble = wReg.bubble = true;
     }
 
+    inline void FiveStageRun() {
+        while (true) {
+
+            WriteBack();
+            MemoryAccess();
+            Execute();
+            Decode();
+            Fetch();
+            if (!fReg.bubble && !dReg.bubble && !eReg.bubble && !mReg.bubble ) {
+                cout << (((unsigned int) Reg[10]) & 255u);
+                break;
+            }
+        }
+    }
+
+
     inline void Run() {
+
         while (true) {
             Fetch();
             if (inst == 13009443) {
@@ -82,10 +99,19 @@ public:
     }
 
     void Fetch() {
-        inst = MemControl->GetInstruction(ProgramCounter);
+        if (ControlHazard) return;
+        dReg.srcInst = MemControl->GetInstruction(ProgramCounter);
+        dReg.pc = ProgramCounter;
+        dReg.bubble = false;
+        if (dReg.srcInst == 13009443) fReg.bubble = true;
     }
 
     void Decode() {
+        if (dReg.bubble || ControlHazard) {
+            if (dReg.bubble) eReg.bubble = true;
+            return;
+        }
+        inst = dReg.srcInst;
         uint32_t opcode = inst & 0x7F;
         uint32_t funct3 = (inst >> 12) & 0x7;
         uint32_t funct7 = (inst >> 25) & 0x7F;
@@ -107,23 +133,25 @@ public:
                 11;
         int32_t csr = imm_i;
         uint32_t reg1, reg2;
-        FReg.dest = rd;
+        eReg.dest = rd;
+        eReg.pc = fReg.pc;
         switch (opcode) {
             case OP_LUI: {
-                FReg.Imm1 = imm_u;
+                eReg.Imm = imm_u;
                 CurrentInst = LUI;
                 break;
             }
             case OP_AUIPC: {
-                FReg.Imm1 = imm_u;
+                ControlHazard = true;
+                eReg.Imm = imm_u;
                 CurrentInst = AUIPC;
                 break;
             }
 
             case OP_REG: {
-                FReg.op1 = Reg[rs1];
-                FReg.op2 = Reg[rs2];
-                FReg.Imm1 = 0; // R-type Get No imm
+                eReg.op1 = Reg[rs1];
+                eReg.op2 = Reg[rs2];
+                eReg.Imm = 0; // R-type Get No imm
                 switch (funct3) {
                     case 0x0: {
                         switch (funct7) {
@@ -206,8 +234,8 @@ public:
                 break;
             }
             case OP_IMM: { // No rs2
-                FReg.op1 = Reg[rs1];
-                FReg.Imm1 = imm_i;
+                eReg.op1 = Reg[rs1];
+                eReg.Imm = imm_i;
                 switch (funct3) {
                     case 0x0:
                         CurrentInst = ADDI;
@@ -229,23 +257,24 @@ public:
                         break;
                     case 0x1:
                         CurrentInst = SLLI;
-                        FReg.Imm1 = FReg.Imm1 & 0x3F;
+                        Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         break;
                     case 0x5:
                         if (((inst >> 26) & 0x3F) == 0x0) {
                             CurrentInst = SRLI;
-                            FReg.Imm1 = FReg.Imm1 & 0x3F;
+                            Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         } else if (((inst >> 26) & 0x3F) == 0x10) {
                             CurrentInst = SRAI;
-                            FReg.Imm1 = FReg.Imm1 & 0x3F;
+                            Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         }
                         break;
+                    default: {}
                 }
                 break;
             }
             case OP_LOAD: {
-                FReg.op1 = Reg[rs1];
-                FReg.Imm1 = imm_i;
+                eReg.op1 = Reg[rs1];
+                eReg.Imm = imm_i;
                 switch (funct3) {
                     case 0x0: {
                         CurrentInst = LB;
@@ -273,9 +302,9 @@ public:
                 break;
             }
             case OP_STORE: {
-                FReg.op1 = Reg[rs1];
-                FReg.op2 = Reg[rs2];
-                FReg.Imm1 = imm_s;
+                eReg.op1 = Reg[rs1];
+                eReg.op2 = Reg[rs2];
+                eReg.Imm = imm_s;
                 switch (funct3) {
                     case 0x0: {
                         CurrentInst = SB;
@@ -295,9 +324,10 @@ public:
                 break;
             }
             case OP_BRANCH: {
-                FReg.op1 = Reg[rs1];
-                FReg.op2 = Reg[rs2];
-                FReg.Imm1 = imm_sb;
+                ControlHazard = true;
+                eReg.op1 = Reg[rs1];
+                eReg.op2 = Reg[rs2];
+                eReg.Imm = imm_sb;
                 switch (funct3) {
                     case 0x0: {
                         CurrentInst = BEQ;
@@ -329,19 +359,21 @@ public:
                 break;
             }
             case OP_JAL: {
+                ControlHazard = true;
                 CurrentInst = JAL;
-                FReg.Imm1 = imm_uj;
+                eReg.Imm = imm_uj;
                 break;
             }
             case OP_JALR: {
+                ControlHazard = true;
                 CurrentInst = JALR;
-                FReg.op1 = Reg[rs1];
-                FReg.Imm1 = imm_i;
+                eReg.op1 = Reg[rs1];
+                eReg.Imm = imm_i;
                 break;
             }
             case OP_SYSTEM: {
-                FReg.op1 = Reg[rs1];
-                FReg.Imm1 = csr;
+                eReg.op1 = Reg[rs1];
+                eReg.Imm = csr;
                 switch (funct3) {
                     case 0x1: {
                         CurrentInst = CSRRW;
@@ -375,17 +407,23 @@ public:
             default: {
             }
         }
+        eReg.inst = CurrentInst;
+        eReg.bubble = false;
     }
 
     void Execute() {
-        Wreg.RegTowrite = FReg.dest;
-        switch (CurrentInst) {
+        if (eReg.bubble) {
+            mReg.bubble = true;
+            return;
+        }
+        mReg.RegTowrite = eReg.dest;
+        switch (eReg.inst) {
             case ADD: {
-                Wreg.out = FReg.op1 + FReg.op2;
+                mReg.out = eReg.op1 + eReg.op2;
                 break;
             }
             case ADDI: {
-                Wreg.out = FReg.op1 + FReg.Imm1;
+                mReg.out = eReg.op1 + eReg.Imm;
                 /*
                  *   TODO if Wreg.out is larger than 1<<32,
                  *    then forsake the high unit
@@ -393,155 +431,151 @@ public:
                 break;
             }
             case SUB: {
-                Wreg.out = FReg.op1 - FReg.op2;
+                mReg.out = eReg.op1 - eReg.op2;
                 break;
             }
             case LUI: {
-                Wreg.out = FReg.Imm1 << 12;
-                Wreg.writeback = true;
+                mReg.out = eReg.Imm<<12;
                 break;
             }
             case AUIPC: {
-                ProgramCounter += FReg.Imm1 << 12;
-                Wreg.out = ProgramCounter + 4;
+                ProgramCounter = eReg.pc + (eReg.Imm<<12);
+                mReg.out = ProgramCounter + 4;
                 break;
             }
             case JAL: {
-                Wreg.out = ProgramCounter + 4;
-                ProgramCounter += FReg.Imm1; //already * 2
+                mReg.out = ProgramCounter + 4;
+                ProgramCounter = eReg.pc + eReg.Imm; //already * 2
                 break;
             }
             case JALR: {
-                Wreg.out = ProgramCounter + 4;
-                ProgramCounter = (FReg.op1 + FReg.Imm1) & (~(uint64_t) 1);
+                mReg.out = ProgramCounter + 4;
+                ProgramCounter =  (eReg.op1 + eReg.Imm) & (~(uint64_t) 1);
                 break;
             }
             case SLL: {
-                Wreg.out = FReg.op1 << FReg.op2;
+                mReg.out = eReg.op1 << eReg.op2;
                 break;
             }
             case SLLI: {
-                Wreg.out = (unsigned)FReg.op1 << (int)((FReg.Imm1<<27)>>27);
-                /*
-                 *  TODO check shamt
-                 */
+                mReg.out = (unsigned)eReg.op1 << (int)((eReg.Imm<<27)>>27);
                 break;
             }
             case SLTU: {
-                Wreg.out = ((uint64_t) FReg.op1 < (uint64_t) FReg.op2) ? 1 : 0;
+                mReg.out = ((uint64_t)eReg.op1 < (uint64_t)eReg.op2) ? 1 : 0;
                 break;
             }
             case SLT: {
-                Wreg.out = (FReg.op1 < FReg.op2) ? 1 : 0;
+                mReg.out = (eReg.op1 < eReg.op2) ? 1 : 0;
                 break;
             }
             case SLTIU: {
-                Wreg.out = ((uint64_t) FReg.op1 < (uint64_t) FReg.Imm1) ? 1 : 0;
+                mReg.out = ((uint64_t) eReg.op1 < (uint64_t) eReg.Imm) ? 1 : 0;
             }
             case SLTI: {
-                Wreg.out = (FReg.op1 < FReg.Imm1) ? 1 : 0;
+                mReg.out = (eReg.op1 < eReg.Imm) ? 1 : 0;
             }
             case SRL: {
-                Wreg.out = (uint64_t) FReg.op1 >> (uint64_t) FReg.op2;
+                mReg.out = (uint64_t) eReg.op1 >> (uint64_t) eReg.op2;
                 break;
             }
             case SRLI: {
-                Wreg.out =  (unsigned)FReg.op1 >> (int) ((FReg.Imm1<<27)>>27); //符号拓展？？
+                mReg.out =  (unsigned)eReg.op1 >> (int) ((eReg.Imm<<27)>>27); //符号拓展？？
                 break;
             }
             case SRA: {
-                Wreg.out = FReg.op1 >> (FReg.op2 & 0x3F);
+                mReg.out = eReg.op1 >> (eReg.op2 & 0x3F);
                 break;
             }
             case SRAI: {
-                Wreg.out = FReg.op1 >> (int) ((FReg.Imm1<<27)>>27);
+                mReg.out = eReg.op1 >> (int) ((eReg.Imm<<27)>>27);
                 break;
             }
             case XOR: {
-                Wreg.out = FReg.op1 ^ FReg.op2;
+                mReg.out = eReg.op1 ^ eReg.op2;
                 break;
             }
             case XORI: {
-                Wreg.out = FReg.op1 ^ FReg.Imm1;
+                mReg.out = eReg.op1 ^ eReg.Imm;
                 break;
             }
             case OR: {
-                Wreg.out = FReg.op1 | FReg.op2;
+                mReg.out = eReg.op1 | eReg.op2;
                 break;
             }
             case ORI: {
-                Wreg.out = FReg.op1 | FReg.Imm1;
+                mReg.out = eReg.op1 | eReg.Imm;
                 break;
             }
             case ANDI: {
-                Wreg.out = FReg.op1 & FReg.Imm1;
+                mReg.out = eReg.op1 & eReg.Imm;
                 break;
             }
             case AND: {
-                Wreg.out = FReg.op1 & FReg.op2;
+                mReg.out = eReg.op1 & eReg.op2;
                 break;
             }
             case BEQ: {
-                if (FReg.op1 == FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if (eReg.op1 == eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case BNE: {
-                if (FReg.op1 != FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if (eReg.op1 != eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case BLTU: {
-                if ((uint64_t) FReg.op1 < (uint64_t) FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if ((uint64_t) eReg.op1 < (uint64_t) eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case BLT: { //有符号数？？
-                if (FReg.op1 < FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if (eReg.op1 < eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case BGEU: {
-                if ((uint64_t) FReg.op1 >= (uint64_t) FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if ((uint64_t) eReg.op1 >= (uint64_t) eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case BGE: {
-                if (FReg.op1 >= FReg.op2) {
-                    ProgramCounter += FReg.Imm1;
+                if (eReg.op1 >= eReg.op2) {
+                    ProgramCounter += eReg.Imm;
                 } else {
                     ProgramCounter += 4;
                 }
                 break;
             }
             case SH: {
-                Wreg.Memdest = FReg.op1 + FReg.Imm1;
-                Wreg.out = FReg.op2 & 0xFFFF;
+                mReg.Memdest = eReg.op1 + eReg.Imm;
+                mReg.out = eReg.op2 & 0xFFFF;
                 break;
             }
             case SW: {
-                Wreg.Memdest = FReg.op1 + FReg.Imm1;
-                Wreg.out = FReg.op2 & 0xFFFFFFFF;
+                mReg.Memdest = eReg.op1 + eReg.Imm;
+                mReg.out = eReg.op2 & 0xFFFFFFFF;
                 break;
             }
             case SB: {
-                Wreg.Memdest = FReg.op1 + FReg.Imm1;
-                Wreg.out = FReg.op2 & 0xFF;
+                mReg.Memdest = eReg.op1 + eReg.Imm;
+                mReg.out = eReg.op2 & 0xFF;
                 break;
             }
             case LHU:
@@ -550,69 +584,75 @@ public:
             case LB:
             case LH:
             case LW: {
-                Wreg.Memdest = FReg.op1 + FReg.Imm1;
+                mReg.Memdest = eReg.op1 + eReg.Imm;
                 break;
-            }
-            case UNKNOWN: {
-                cout << " shit "; break;
             }
             default: {
             }
         }
         // Prepare for the next task
-        Wreg.writeback = !isBranchOrStore(CurrentInst);
+        mReg.writeback = !isBranchOrStore(CurrentInst);
         if (!isJump(CurrentInst)) {
             ProgramCounter += 4; // not jump, go forward
         }
-        Wreg.mem = isReadMem(CurrentInst);
+        mReg.mem = isReadMem(CurrentInst);
+        mReg.pc = eReg.pc;
+        eReg.bubble = false;
     }
 
     void MemoryAccess() {    //写到内存
-        if (!Wreg.mem) return;
-        switch (CurrentInst) {
+        if (mReg.bubble) {
+            wReg.bubble = true;
+            return;
+        }
+        if (!mReg.mem) return;
+        switch (mReg.inst) {
             case SB: {
-                MemControl->StoreByte(Wreg.out, Wreg.Memdest);
+                MemControl->StoreByte(mReg.out, mReg.Memdest);
                 break;
             }
             case SH: {
-                MemControl->StoreHalfWord(Wreg.out, Wreg.Memdest);
+                MemControl->StoreHalfWord(mReg.out, mReg.Memdest);
                 break;
             }
             case SW: {
-                MemControl->StoreWord(Wreg.out, Wreg.Memdest);
+                MemControl->StoreWord(mReg.out, mReg.Memdest);
                 break;
             }
             case LBU: {
-                Wreg.out = (uint64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFF);
+                wReg.out = (uint64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFF);
                 break;
             }
             case LHU: {
-                Wreg.out = (uint64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFFFF);
+                wReg.out = (uint64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFFFF);
                 break;
             }
             case LWU: {
-                Wreg.out = (uint64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFFFFFFFF);
+                wReg.out = (uint64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFFFFFFFF);
                 break;
             }
             case LB: {
-                Wreg.out = (int64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFF);
+                wReg.out = (int64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFF);
                 break;
             }
             case LH: {
-                Wreg.out = (int64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFFFF);
+                wReg.out = (int64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFFFF);
                 break;
             }
             case LW: {
-                Wreg.out = (int64_t) (MemControl->GetInstruction(Wreg.Memdest) & 0xFFFFFFFF);
+                wReg.out = (int64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFFFFFFFF);
                 break;
             }
+            default: {}
         }
     }
 
     void WriteBack() {       //写到寄存器
-        if (!Wreg.writeback) return;
-        else {
-            Reg[Wreg.RegTowrite] = Wreg.out;
+        if (wReg.bubble) return;
+        else if (!wReg.writeback) {
+            return;
+        } else {
+            Reg[wReg.RegTowrite] = wReg.out;
         }
     }
 
