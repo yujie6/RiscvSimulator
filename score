@@ -23,12 +23,12 @@ do
 		then 
 				echo -e "${NON}${RES}\c"
 				printf "Test for %-20s" ${file//.data}
-				echo -e "${GRN}AC${RES}"
+				echo -e "${GRN}Accepted${RES}"
 				score=$((score+10))
 		else
 				echo -e "${NON}${RES}\c"
 				printf "Test for %-20s" ${file//.data}
-				echo -e "${RED}WA${RES}"
+				echo -e "${RED}Wrong answer${RES}"
 		fi
 done
 echo -e "${GOD}Congradulations! You got $score/180 score.${RES}"
