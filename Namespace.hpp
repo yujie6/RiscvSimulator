@@ -26,6 +26,15 @@ namespace yujie6 {
         UJ_TYPE,
     };
 
+    const char *INSTNAME[]{
+            "lui",  "auipc", "jal",   "jalr",  "beq",   "bne",  "blt",  "bge",  "bltu",
+            "bgeu", "lb",    "lh",    "lw",    "ld",    "lbu",  "lhu",  "sb",   "sh",
+            "sw",   "sd",    "addi",  "slti",  "sltiu", "xori", "ori",  "andi", "slli",
+            "srli", "srai",  "add",   "sub",   "sll",   "slt",  "sltu", "xor",  "srl",
+            "sra",  "or",    "and",   "ecall", "addiw", "mul",  "mulh", "div",  "rem",
+            "lwu",  "slliw", "srliw", "sraiw", "addw",  "subw", "sllw", "srlw", "sraw",
+    };
+
     enum Inst {
         LUI = 0,
         AUIPC = 1,

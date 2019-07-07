@@ -26,7 +26,7 @@ namespace yujie6 {
     }
 
     inline bool isReadMem(Inst inst) {
-        return inst == LB || inst == LH || inst == LW  || inst == LBU ||
+        return inst == LB || inst == LH || inst == LW || inst == LBU ||
                inst == LHU || inst == LWU || inst == SB || inst == SW || inst == SH;
     }
 }
@@ -67,12 +67,13 @@ public:
     inline void FiveStageRun() {
         while (true) {
             cycle++;
+            if (cycle >= 250) break;
             WriteBack();
             MemoryAccess();
             Execute();
             Decode();
             Fetch();
-            if (!fReg.bubble && !dReg.bubble && !eReg.bubble && !mReg.bubble ) {
+            if (fReg.bubble && dReg.bubble && eReg.bubble && mReg.bubble && wReg.bubble) {
                 cout << (((unsigned int) Reg[10]) & 255u);
                 break;
             }
@@ -86,7 +87,7 @@ public:
             Fetch();
             if (inst == 13009443) {
                 auto ans = (((unsigned int) Reg[10]) & 255u);
-                cout << ans << "\n";
+                cout << std::dec << ans << "\n";
                 break;
             }
             Decode();
@@ -94,18 +95,18 @@ public:
             MemoryAccess();
             WriteBack();
             auto ans = (((unsigned int) Reg[10]) & 255u);
-            //cout << std::hex << ProgramCounter << " ";
-            //cout << std::dec << ans << "\n";
             if (Reg[0] != 0) Reg[0] = 0;
         }
     }
 
     void Fetch() {
-        if (ControlHazard) {
+        if (ControlHazard || fReg.bubble) {
             dReg.bubble = true;
             return;
         }
-        else ProgramCounter = fReg.pc;
+        if (DataHazard) {
+            return;
+        } else ProgramCounter = fReg.pc;
         dReg.srcInst = MemControl->GetInstruction(ProgramCounter);
         dReg.pc = ProgramCounter;
         dReg.bubble = false;
@@ -113,9 +114,42 @@ public:
         if (dReg.srcInst == 13009443) fReg.bubble = true;
     }
 
+    inline bool DataCrash(uint32_t opcode, uint32_t rs1, uint32_t rs2) {
+        bool read_rs1 = false;
+        bool read_rs2 = false;
+        switch (opcode) {
+            case OP_REG:
+            case OP_STORE:
+            case OP_BRANCH:
+                read_rs1 = read_rs2 = true;
+                break;
+            case OP_IMM:
+            case OP_LOAD:
+            case OP_JALR:
+            case OP_SYSTEM:
+                read_rs1 = true;
+                break;
+            default: {
+            }
+        }
+        if (read_rs1) {
+            if ((rs1 == mReg.RegTowrite && !mReg.bubble && mReg.writeback)
+                || (rs1 == wReg.RegTowrite && !wReg.bubble && wReg.writeback)) {
+                return true;
+            }
+        }
+        if (read_rs2) {
+            if ((rs2 == mReg.RegTowrite && !mReg.bubble && mReg.writeback)
+                || (rs2 == wReg.RegTowrite && !wReg.bubble && wReg.writeback)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void Decode() {
-        if (dReg.bubble || ControlHazard) {
-            if (dReg.bubble) eReg.bubble = true;
+        if (dReg.bubble || ControlHazard || DataHazard) {
+            if (dReg.bubble || DataHazard) eReg.bubble = true;
             return;
         }
         inst = dReg.srcInst;
@@ -139,7 +173,11 @@ public:
                 << 12 >>
                 11;
         int32_t csr = imm_i;
-        uint32_t reg1, reg2;
+        if (DataCrash(opcode, rs1, rs2)) {
+            DataHazard = true;
+            eReg.bubble = true;
+            return;
+        }
         switch (opcode) {
             case OP_LUI: {
                 eReg.Imm = imm_u;
@@ -273,7 +311,8 @@ public:
                             Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         }
                         break;
-                    default: {}
+                    default: {
+                    }
                 }
                 break;
             }
@@ -412,6 +451,7 @@ public:
             default: {
             }
         }
+
         eReg.dest = rd;
         eReg.pc = dReg.pc;
         eReg.inst = CurrentInst;
@@ -442,11 +482,11 @@ public:
                 break;
             }
             case LUI: {
-                mReg.out = eReg.Imm<<12;
+                mReg.out = eReg.Imm << 12;
                 break;
             }
             case AUIPC: {
-                fReg.pc = eReg.pc + (eReg.Imm<<12);
+                fReg.pc = eReg.pc + (eReg.Imm << 12);
                 mReg.out = eReg.pc + 4;
                 break;
             }
@@ -457,7 +497,7 @@ public:
             }
             case JALR: {
                 mReg.out = eReg.pc + 4;
-                fReg.pc =  (eReg.op1 + eReg.Imm) & (~(uint64_t) 1);
+                fReg.pc = (eReg.op1 + eReg.Imm) & (~(uint64_t) 1);
                 break;
             }
             case SLL: {
@@ -465,11 +505,11 @@ public:
                 break;
             }
             case SLLI: {
-                mReg.out = (unsigned)eReg.op1 << (int)((eReg.Imm<<27)>>27);
+                mReg.out = (unsigned) eReg.op1 << (int) ((eReg.Imm << 27) >> 27);
                 break;
             }
             case SLTU: {
-                mReg.out = ((uint64_t)eReg.op1 < (uint64_t)eReg.op2) ? 1 : 0;
+                mReg.out = ((uint64_t) eReg.op1 < (uint64_t) eReg.op2) ? 1 : 0;
                 break;
             }
             case SLT: {
@@ -487,7 +527,7 @@ public:
                 break;
             }
             case SRLI: {
-                mReg.out =  (unsigned)eReg.op1 >> (int) ((eReg.Imm<<27)>>27); //符号拓展？？
+                mReg.out = (unsigned) eReg.op1 >> (int) ((eReg.Imm << 27) >> 27); //符号拓展？？
                 break;
             }
             case SRA: {
@@ -495,7 +535,7 @@ public:
                 break;
             }
             case SRAI: {
-                mReg.out = eReg.op1 >> (int) ((eReg.Imm<<27)>>27);
+                mReg.out = eReg.op1 >> (int) ((eReg.Imm << 27) >> 27);
                 break;
             }
             case XOR: {
@@ -650,16 +690,22 @@ public:
                 wReg.out = (int64_t) (MemControl->GetInstruction(mReg.Memdest) & 0xFFFFFFFF);
                 break;
             }
-            default: {}
+            default: {
+            }
         }
     }
 
     void WriteBack() {       //写到寄存器
         if (wReg.bubble) return;
         if (!wReg.writeback) {
+            cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst] << "\n";
             return;
         } else {
             Reg[wReg.RegTowrite] = wReg.out;
+            cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst] << "\n";
+            if (DataHazard && mReg.bubble) {
+                DataHazard = false;
+            }
         }
     }
 
