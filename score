@@ -1,18 +1,48 @@
 #!/bin/bash
 :<<EOF
-echo :
-sdasd
-sadasdsd
+simple test file for riscv 
+big homework
 EOF
-str="hello";
-test_file=(
-"gcd.data"
-"hanoi.data"
-"expr.data"
-);
-for file in ${test_file}
+RED='\E[1;31m'
+GRN='\E[1;32m'
+GOD='\E[1;33m'
+NON='\E[1;0m'
+score=0
+:<<EOF
+timetest(){
+	for file in $(ls src/ | grep data) 
+	do 
+		grep real <(time -p (./cmake-build-debug/code < "./src/$file" > /dev/null))
+			
+	done
+}
+
+if [[ $1 -eq "-t" ]]
+	then timetest
+	exit 0
+fi
+EOF
+for file in $(ls src/ | grep data)
 do
-		echo ${file};
+		cfile=${file//data/c}
+		cd src/
+		g++ $cfile
+		./a.out
+		ans=$?
+		rm a.out
+		cd ..
+		myans=$(./cmake-build-debug/code < "./src/$file")
+		if [[ $ans -eq $myans ]]
+		then 
+				echo -e "${NON}${RES}\c"
+				printf "Test for %-20s" ${file//.data}
+				echo -e "${GRN}Accepted${RES}"
+				score=$((score+10))
+		else
+				echo -e "${NON}${RES}\c"
+				printf "Test for %-20s" ${file//.data}
+				echo -e "${RED}Wrong answer${RES}"
+		fi
 done
-echo
-echo $str;
+echo -e "${GOD}Congradulations! You got $score/180 score.${RES}"
+

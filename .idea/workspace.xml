@@ -11,7 +11,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2530bab-e526-49ab-b9c5-8bc48692b620" name="Default Changelist" comment="" />
+    <list default="true" id="d2530bab-e526-49ab-b9c5-8bc48692b620" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/program.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/program.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/score" beforeDir="false" afterPath="$PROJECT_DIR$/score" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,7 +37,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="57">
+                <state relative-caret-position="69">
                   <caret line="3" column="25" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
                 </state>
               </provider>
@@ -43,7 +46,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/main.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="190">
+                <state relative-caret-position="230">
                   <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
                   <folding>
                     <element signature="e#38#57#0" expanded="true" />
@@ -52,7 +55,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Namespace.hpp">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="380">
@@ -64,17 +67,17 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/score">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="228">
-                  <caret line="12" column="6" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
+                <state relative-caret-position="253">
+                  <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/memory.hpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1406">
-                  <caret line="74" column="29" selection-start-line="74" selection-start-column="29" selection-end-line="74" selection-end-column="29" />
+                <state relative-caret-position="483">
+                  <caret line="21" selection-start-line="21" selection-end-line="21" />
                 </state>
               </provider>
             </entry>
@@ -82,18 +85,14 @@
         </leaf>
       </split-first>
       <split-second>
-        <leaf>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/program.hpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="923">
-                  <caret line="651" column="31" selection-start-line="651" selection-start-column="23" selection-end-line="651" selection-end-column="32" />
+                <state relative-caret-position="349">
+                  <caret line="589" column="32" selection-start-line="589" selection-start-column="32" selection-end-line="589" selection-end-column="32" />
                   <folding>
                     <element signature="e#39#57#0" expanded="true" />
-                    <element signature="e#1985#2538#0" />
-                    <element signature="e#2095#11862#0" />
-                    <element signature="e#12893#18538#0" />
-                    <element signature="e#17641#19033#0" />
                   </folding>
                 </state>
               </provider>
@@ -105,7 +104,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>insttype</find>
       <find>ADDI</find>
       <find>wirte</find>
       <find>memory</find>
@@ -135,6 +133,7 @@
       <find>sll</find>
       <find>decode</find>
       <find>FReg</find>
+      <find>f</find>
     </findStrings>
     <replaceStrings>
       <replace>CurrentInst</replace>
@@ -252,11 +251,12 @@
       <workItem from="1562027837435" duration="37538000" />
       <workItem from="1562132681045" duration="54614000" />
       <workItem from="1562309372327" duration="9776000" />
+      <workItem from="1562467516598" duration="4556000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102901000" />
+    <option name="totallyTimeSpent" value="107457000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -269,24 +269,25 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="28" width="2560" height="1412" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4983871" visible="true" weight="0.1185362" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4983871" visible="true" weight="0.11933174" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.5016129" side_tool="true" weight="0.18303095" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.15239592" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.37239867" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3723488" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32968238" />
       <window_info anchor="bottom" id="Tail" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4990775" weight="0.20043811" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4990775" weight="0.30871955" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5009225" side_tool="true" weight="0.18729463" />
       <window_info anchor="bottom" id="CMake" order="12" weight="0.3603505" />
-      <window_info anchor="bottom" id="Messages" order="13" weight="0.36473164" />
+      <window_info active="true" anchor="bottom" id="Messages" order="13" visible="true" weight="0.36370778" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -300,20 +301,26 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <condition expression="cycle == 5" language="ObjectiveC" />
           <url>file://$PROJECT_DIR$/program.hpp</url>
-          <line>482</line>
-          <option name="timeStamp" value="52" />
+          <line>69</line>
+          <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/memory.hpp</url>
-          <line>21</line>
-          <option name="timeStamp" value="53" />
+          <url>file://$PROJECT_DIR$/program.hpp</url>
+          <line>587</line>
+          <option name="timeStamp" value="56" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>cycle == 5</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>ProgramCounter == 5728</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -435,48 +442,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/FiveStage.h" />
+    <entry file="file://$PROJECT_DIR$/FiveStage.cpp" />
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
+        <state relative-caret-position="69">
           <caret line="3" column="25" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/memory.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1406">
-          <caret line="74" column="29" selection-start-line="74" selection-start-column="29" selection-end-line="74" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/score">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" column="6" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FiveStage.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="16" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FiveStage.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
+        <state relative-caret-position="230">
           <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
           <folding>
             <element signature="e#38#57#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/score">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -487,16 +475,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/memory.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/program.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="923">
-          <caret line="651" column="31" selection-start-line="651" selection-start-column="23" selection-end-line="651" selection-end-column="32" />
+        <state relative-caret-position="349">
+          <caret line="589" column="32" selection-start-line="589" selection-start-column="32" selection-end-line="589" selection-end-column="32" />
           <folding>
             <element signature="e#39#57#0" expanded="true" />
-            <element signature="e#1985#2538#0" />
-            <element signature="e#2095#11862#0" />
-            <element signature="e#12893#18538#0" />
-            <element signature="e#17641#19033#0" />
           </folding>
         </state>
       </provider>

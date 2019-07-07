@@ -46,6 +46,7 @@ public:
     int Reg[32];
     bool DataHazard;
     bool ControlHazard;
+    int cycle;
     FReg fReg;
     DReg dReg;
     EReg eReg;
@@ -55,7 +56,8 @@ public:
     program() {
         memset(Reg, 0, sizeof(Reg));
         MemControl = new MemoryController();
-        ProgramCounter = 0;
+        fReg.pc = 0;
+        cycle = 0;
         DataHazard = ControlHazard = false;
         fReg.bubble = false;
         dReg.bubble = eReg.bubble = true;
@@ -64,7 +66,7 @@ public:
 
     inline void FiveStageRun() {
         while (true) {
-
+            cycle++;
             WriteBack();
             MemoryAccess();
             Execute();
@@ -99,10 +101,15 @@ public:
     }
 
     void Fetch() {
-        if (ControlHazard) return;
+        if (ControlHazard) {
+            dReg.bubble = true;
+            return;
+        }
+        else ProgramCounter = fReg.pc;
         dReg.srcInst = MemControl->GetInstruction(ProgramCounter);
         dReg.pc = ProgramCounter;
         dReg.bubble = false;
+        fReg.pc = ProgramCounter + 4;
         if (dReg.srcInst == 13009443) fReg.bubble = true;
     }
 
@@ -133,8 +140,6 @@ public:
                 11;
         int32_t csr = imm_i;
         uint32_t reg1, reg2;
-        eReg.dest = rd;
-        eReg.pc = fReg.pc;
         switch (opcode) {
             case OP_LUI: {
                 eReg.Imm = imm_u;
@@ -407,6 +412,8 @@ public:
             default: {
             }
         }
+        eReg.dest = rd;
+        eReg.pc = dReg.pc;
         eReg.inst = CurrentInst;
         eReg.bubble = false;
     }
@@ -439,18 +446,18 @@ public:
                 break;
             }
             case AUIPC: {
-                ProgramCounter = eReg.pc + (eReg.Imm<<12);
-                mReg.out = ProgramCounter + 4;
+                fReg.pc = eReg.pc + (eReg.Imm<<12);
+                mReg.out = eReg.pc + 4;
                 break;
             }
             case JAL: {
-                mReg.out = ProgramCounter + 4;
-                ProgramCounter = eReg.pc + eReg.Imm; //already * 2
+                mReg.out = eReg.pc + 4;
+                fReg.pc = eReg.pc + eReg.Imm;
                 break;
             }
             case JALR: {
-                mReg.out = ProgramCounter + 4;
-                ProgramCounter =  (eReg.op1 + eReg.Imm) & (~(uint64_t) 1);
+                mReg.out = eReg.pc + 4;
+                fReg.pc =  (eReg.op1 + eReg.Imm) & (~(uint64_t) 1);
                 break;
             }
             case SLL: {
@@ -517,49 +524,37 @@ public:
             }
             case BEQ: {
                 if (eReg.op1 == eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
             case BNE: {
                 if (eReg.op1 != eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
             case BLTU: {
                 if ((uint64_t) eReg.op1 < (uint64_t) eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
             case BLT: { //有符号数？？
                 if (eReg.op1 < eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
             case BGEU: {
                 if ((uint64_t) eReg.op1 >= (uint64_t) eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
             case BGE: {
                 if (eReg.op1 >= eReg.op2) {
-                    ProgramCounter += eReg.Imm;
-                } else {
-                    ProgramCounter += 4;
+                    fReg.pc = eReg.pc + eReg.Imm;
                 }
                 break;
             }
@@ -590,14 +585,18 @@ public:
             default: {
             }
         }
+        if (ControlHazard) {
+            if (isJump(eReg.inst)) {
+                ControlHazard = false;
+            }
+        }
         // Prepare for the next task
         mReg.writeback = !isBranchOrStore(CurrentInst);
-        if (!isJump(CurrentInst)) {
-            ProgramCounter += 4; // not jump, go forward
-        }
         mReg.mem = isReadMem(CurrentInst);
         mReg.pc = eReg.pc;
-        eReg.bubble = false;
+        mReg.bubble = false;
+        mReg.inst = eReg.inst;
+
     }
 
     void MemoryAccess() {    //写到内存
@@ -605,7 +604,15 @@ public:
             wReg.bubble = true;
             return;
         }
-        if (!mReg.mem) return;
+        wReg.bubble = false;
+        wReg.pc = mReg.pc;
+        wReg.inst = mReg.inst;
+        wReg.out = mReg.out;
+        wReg.RegTowrite = mReg.RegTowrite;
+        wReg.writeback = mReg.writeback;
+        if (!mReg.mem) {
+            return;
+        }
         switch (mReg.inst) {
             case SB: {
                 MemControl->StoreByte(mReg.out, mReg.Memdest);
@@ -649,7 +656,7 @@ public:
 
     void WriteBack() {       //写到寄存器
         if (wReg.bubble) return;
-        else if (!wReg.writeback) {
+        if (!wReg.writeback) {
             return;
         } else {
             Reg[wReg.RegTowrite] = wReg.out;
