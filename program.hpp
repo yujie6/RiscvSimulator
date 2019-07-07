@@ -67,8 +67,9 @@ public:
     inline void FiveStageRun() {
         while (true) {
             cycle++;
-            if (cycle >= 250) break;
+            //if (cycle >= 450) break;
             WriteBack();
+            if (Reg[0] != 0) Reg[0] = 0;
             MemoryAccess();
             Execute();
             Decode();
@@ -77,6 +78,7 @@ public:
                 cout << (((unsigned int) Reg[10]) & 255u);
                 break;
             }
+            if (Reg[0] != 0) Reg[0] = 0;
         }
     }
 
@@ -698,11 +700,15 @@ public:
     void WriteBack() {       //写到寄存器
         if (wReg.bubble) return;
         if (!wReg.writeback) {
-            cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst] << "\n";
+            auto ans = (((unsigned int) Reg[10]) & 255u);
+            //cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst];
+            //cout << std::dec << " " << ans << "\n";
             return;
         } else {
             Reg[wReg.RegTowrite] = wReg.out;
-            cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst] << "\n";
+            auto ans = (((unsigned int) Reg[10]) & 255u);
+            //cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst];
+            //cout << std::dec << " " << ans << "\n";
             if (DataHazard && mReg.bubble) {
                 DataHazard = false;
             }
