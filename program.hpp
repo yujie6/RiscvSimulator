@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
-#include "parser.hpp"
+#include "namespace.hpp"
 #include "memory.hpp"
 
 namespace yujie6 {
@@ -46,7 +46,6 @@ using std::cout;
 
 class program {
 public:
-    parser *par;
     MemoryController *MemControl;
     int ProgramCounter;
     Inst CurrentInst;
@@ -56,7 +55,6 @@ public:
     int Reg[32];
 
     program() {
-        par = new parser();
         memset(Reg, 0, sizeof(Reg));
         MemControl = new MemoryController();
         ProgramCounter = 0;
@@ -67,7 +65,7 @@ public:
             Fetch();
             if (inst == 13009443) {
                 auto ans = (((unsigned int) Reg[10]) & 255u);
-                cout << ans << "\n";
+                cout << std::dec << ans << "\n";
                 break;
             }
             Decode();
@@ -76,7 +74,7 @@ public:
             WriteBack();
             auto ans = (((unsigned int) Reg[10]) & 255u);
             //cout << std::hex << ProgramCounter << " ";
-            //cout << std::dec << ans << "\n";
+            //cout << INSTNAME[CurrentInst] << std::dec << " " << ans << "\n";
             if (Reg[0] != 0) Reg[0] = 0;
         }
     }
