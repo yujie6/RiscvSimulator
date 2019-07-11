@@ -5,15 +5,11 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
+#include <vector>
 #include "Namespace.hpp"
 #include "memory.hpp"
 
 namespace yujie6 {
-    struct PipeRegister {
-        uint64_t Imm1;
-        int64_t op1, op2;
-        uint32_t dest;
-    };
 
     inline bool isBranchOrStore(Inst inst) {
         return inst == BEQ || inst == BNE || inst == BLT || inst == BGE ||
@@ -36,16 +32,35 @@ using namespace yujie6;
 using std::cin;
 using std::cout;
 
+class History {
+public:
+    std::vector<std::string> history;
+
+    void AddCommand(std::string cmd) {
+        history.push_back(cmd);
+    }
+
+    void Dump() {
+        for (const auto &i : history) {
+            cout << i << "\n";
+        }
+    }
+
+};
+
 class program {
 public:
     MemoryController *MemControl;
     int ProgramCounter;
     Inst CurrentInst;
-    PipeRegister Fereg;
+    History history;
     uint32_t inst;
     int Reg[32];
     bool DataHazard;
     bool ControlHazard;
+    bool MemSimulation;
+    int MemCycleLeft;
+    bool StoreHistory;
     int cycle;
     FReg fReg;
     DReg dReg;
@@ -59,49 +74,59 @@ public:
         fReg.pc = 0;
         cycle = 0;
         DataHazard = ControlHazard = false;
+        MemSimulation = false;
+        MemCycleLeft = 0;
         fReg.bubble = false;
         dReg.bubble = eReg.bubble = true;
         mReg.bubble = wReg.bubble = true;
     }
 
-    inline void FiveStageRun() {
-        while (true) {
-            cycle++;
-            //if (cycle >= 450) break;
-            WriteBack();
-            if (Reg[0] != 0) Reg[0] = 0;
-            MemoryAccess();
-            Execute();
-            Decode();
-            Fetch();
-            if (fReg.bubble && dReg.bubble && eReg.bubble && mReg.bubble && wReg.bubble) {
-                cout << (((unsigned int) Reg[10]) & 255u);
-                break;
+    inline void FiveStageRun(bool slow) {
+        StoreHistory = slow;
+        if (!slow) {
+            while (true) {
+                cycle++;
+                //if (cycle >= 450) break;
+                WriteBack();
+                if (Reg[0] != 0) Reg[0] = 0;
+                MemoryAccess();
+                Execute();
+                Decode();
+                Fetch();
+                if (fReg.bubble && dReg.bubble && eReg.bubble && mReg.bubble && wReg.bubble) {
+                    cout << (((unsigned int) Reg[10]) & 255u);
+                    break;
+                }
+                if (Reg[0] != 0) Reg[0] = 0;
             }
-            if (Reg[0] != 0) Reg[0] = 0;
+        } else {
+            while (true) {
+                cycle++;
+                //if (cycle >= 450) break;
+                WriteBack();
+                if (Reg[0] != 0) Reg[0] = 0;
+                MemoryAccess();
+                Execute();
+                Decode();
+                Fetch();
+                if (fReg.bubble && dReg.bubble && eReg.bubble && mReg.bubble && wReg.bubble) {
+                    cout << (((unsigned int) Reg[10]) & 255u);
+                    break;
+                }
+                if (Reg[0] != 0) Reg[0] = 0;
+            }
         }
+
     }
 
-
-    inline void Run() {
-
-        while (true) {
-            Fetch();
-            if (inst == 13009443) {
-                auto ans = (((unsigned int) Reg[10]) & 255u);
-                cout << std::dec << ans << "\n";
-                break;
-            }
-            Decode();
-            Execute();
-            MemoryAccess();
-            WriteBack();
-            auto ans = (((unsigned int) Reg[10]) & 255u);
-            if (Reg[0] != 0) Reg[0] = 0;
-        }
+    void DumpHistory() {
+        if (!StoreHistory) return;
+        cout << "\nCommand History:\n";
+        history.Dump();
     }
 
     void Fetch() {
+        if (MemSimulation) return;
         if (ControlHazard || fReg.bubble) {
             dReg.bubble = true;
             return;
@@ -150,6 +175,7 @@ public:
     }
 
     void Decode() {
+        if (MemSimulation) return;
         if (dReg.bubble || ControlHazard || DataHazard) {
             if (dReg.bubble || DataHazard) eReg.bubble = true;
             return;
@@ -302,15 +328,12 @@ public:
                         break;
                     case 0x1:
                         CurrentInst = SLLI;
-                        Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         break;
                     case 0x5:
                         if (((inst >> 26) & 0x3F) == 0x0) {
                             CurrentInst = SRLI;
-                            Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         } else if (((inst >> 26) & 0x3F) == 0x10) {
                             CurrentInst = SRAI;
-                            Fereg.Imm1 = Fereg.Imm1 & 0x3F;
                         }
                         break;
                     default: {
@@ -461,6 +484,7 @@ public:
     }
 
     void Execute() {
+        if (MemSimulation) return;
         if (eReg.bubble) {
             mReg.bubble = true;
             return;
@@ -655,6 +679,13 @@ public:
         if (!mReg.mem) {
             return;
         }
+        if (MemSimulation) {
+            MemCycleLeft--;
+            if (MemCycleLeft == 1) MemSimulation = false;
+        } else {
+            MemCycleLeft = 3;
+            MemSimulation = true;
+        }
         switch (mReg.inst) {
             case SB: {
                 MemControl->StoreByte(mReg.out, mReg.Memdest);
@@ -698,6 +729,7 @@ public:
     }
 
     void WriteBack() {       //写到寄存器
+        if (MemSimulation) return;
         if (wReg.bubble) return;
         if (!wReg.writeback) {
             auto ans = (((unsigned int) Reg[10]) & 255u);
@@ -707,6 +739,10 @@ public:
         } else {
             Reg[wReg.RegTowrite] = wReg.out;
             auto ans = (((unsigned int) Reg[10]) & 255u);
+            if (StoreHistory) {
+                std::string CmdNow = std::to_string(wReg.pc) + " " + INSTNAME[wReg.inst];
+                history.AddCommand(CmdNow);
+            }
             //cout << std::hex << wReg.pc << " " << INSTNAME[wReg.inst];
             //cout << std::dec << " " << ans << "\n";
             if (DataHazard && mReg.bubble) {

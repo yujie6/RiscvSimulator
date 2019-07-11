@@ -8,6 +8,7 @@ using namespace yujie6;
 
 int main(){
     program riscv;
-    riscv.FiveStageRun();
+    riscv.FiveStageRun(false);
+    riscv.DumpHistory();
     return 0;
 }

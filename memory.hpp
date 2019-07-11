@@ -9,7 +9,7 @@ using std::cout;
 
 class MemoryController {
 public:
-    uint32_t memory[0x30000];
+    uint8_t memory[0x30000];
     int MaxPc;
     MemoryController() {
         init();
